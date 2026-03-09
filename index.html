@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html>test</html><!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Training Lab - ãã¬ã¼ãã³ã°ç®¡çããã·ã¥ãã¼ã</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Segoe UI',sans-serif;background:#f0f2f5;color:#1a1a2e}
+:root{--primary:#4361ee;--primary-light:#eef0ff;--accent:#f72585;--success:#06d6a0;--warning:#ffd166;--dark:#1a1a2e;--gray:#6c757d;--light:#f8f9fa;--shadow:0 2px 12px rgba(0,0,0,0.08)}
+.app{display:flex;min-height:100vh}
+.sidebar{width:240px;background:linear-gradient(180deg,#1a1a2e,#16213e);color:#fff;padding:20px 14px;position:fixed;height:100vh;overflow-y:auto;z-index:10}
+.sidebar h1{font-size:17px;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.sidebar .sub{font-size:11px;color:#adb5bd;margin-bottom:28px}
+.nav-item{padding:11px 14px;border-radius:10px;cursor:pointer;margin-bottom:3px;font-size:13px;display:flex;align-items:center;gap:9px;color:#bbb;transition:.2s}
+.nav-item:hover{background:rgba(255,255,255,.1);color:#fff}
+.nav-item.active{background:var(--primary);color:#fff;font-weight:600}
+.main{margin-left:240px;flex:1;padding:24px 28px;min-height:100vh}
+.page-title{font-size:22px;font-weight:700;margin-bottom:4px}
+.page-sub{color:var(--gray);font-size:13px;margin-bottom:20px}
+.card{background:#fff;border-radius:14px;padding:22px;box-shadow:var(--shadow);margin-bottom:18px}
+.card h3{font-size:15px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px}
+.stat-card{background:#fff;border-radius:14px;padding:18px;box-shadow:var(--shadow)}
+.stat-card .label{font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:.5px}
+.stat-card .value{font-size:26px;font-weight:700;margin:2px 0}
+.stat-card .unit{font-size:13px;color:var(--gray)}
+.stat-card .sub{font-size:11px;color:var(--gray)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:9px 10px;font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #eee}
+td{padding:9px 10px;border-bottom:1px solid #f0f0f0;font-size:13px}
+tr:hover td{background:#fafbfc}
+input,select,textarea{border:1.5px solid #ddd;border-radius:8px;padding:7px 10px;font-size:13px;width:100%;transition:.2s;font-family:inherit}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)}
+textarea{resize:vertical;min-height:50px}
+.btn{padding:7px 16px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:5px}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:#3a56d4}
+.btn-outline{background:transparent;border:1.5px solid #ddd;color:var(--dark)}
+.btn-outline:hover{border-color:var(--primary);color:var(--primary)}
+.btn-sm{padding:4px 10px;font-size:11px}
+.btn-danger{background:#ff6b6b;color:#fff}
+.btn-danger:hover{background:#ee5a5a}
+.btn-success{background:var(--success);color:#fff}
+.badge{padding:2px 9px;border-radius:20px;font-size:10px;font-weight:600;display:inline-block;background:var(--primary-light);color:var(--primary)}
+.form-group{margin-bottom:12px}
+.form-group label{display:block;font-size:11px;font-weight:600;color:var(--gray);margin-bottom:3px}
+.form-row{display:flex;gap:10px}
+.form-row>*{flex:1}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:100}
+.modal{background:#fff;border-radius:16px;padding:24px;width:460px;max-width:90vw;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal h3{font-size:17px;margin-bottom:18px}
+.progress-bar{height:7px;background:#eee;border-radius:4px;overflow:hidden}
+.progress-bar .fill{height:100%;border-radius:4px;transition:width .3s}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.calendar-header{font-size:11px;font-weight:600;text-align:center;padding:6px;color:var(--gray)}
+.cal-day{border:1.5px solid #eee;border-radius:8px;padding:6px;min-height:60px;font-size:11px;cursor:pointer;transition:.2s}
+.cal-day:hover{border-color:var(--primary)}
+.cal-day.has-training{border-color:var(--primary);background:var(--primary-light)}
+.cal-day .dn{font-weight:700;color:var(--gray);margin-bottom:3px}
+.cal-day .dn.today{color:var(--accent)}
+.cal-day .ti{font-size:10px;background:#fff;padding:2px 5px;border-radius:4px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.empty{text-align:center;padding:36px;color:var(--gray);font-size:13px}
+.share-banner{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;padding:14px 18px;border-radius:12px;margin-bottom:18px}
+.share-banner strong{font-size:14px}
+.share-banner p{font-size:12px;opacity:.9;margin-top:3px}
+.bar-chart{display:flex;align-items:flex-end;gap:6px;height:160px;padding:10px 0}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar-col .bar{width:100%;border-radius:6px 6px 0 0;transition:.3s;min-height:2px;cursor:pointer;position:relative}
+.bar-col .bar:hover{opacity:.85}
+.bar-col .bar-label{font-size:10px;color:var(--gray)}
+.bar-col .bar-val{font-size:10px;font-weight:600}
+.line-chart{position:relative;height:180px;border-left:1px solid #ddd;border-bottom:1px solid #ddd;margin:10px 0}
+.line-chart svg{width:100%;height:100%}
+.day-picker{display:flex;flex-wrap:wrap;gap:3px}
+.day-picker .dp{width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:7px;cursor:pointer;font-size:12px;border:1px solid #eee;transition:.2s}
+.day-picker .dp:hover{border-color:var(--primary)}
+.day-picker .dp.sel{background:var(--primary);color:#fff;border-color:var(--primary)}
+.day-picker .dp.has{background:#e6faf3;color:var(--success);border-color:#c3f0e0}
+.menu-card{background:#f8f9fa;border-radius:8px;padding:10px;margin-bottom:7px}
+.menu-cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.hidden{display:none}
+.page{display:none}
+.page.active{display:block}
+@media(max-width:800px){.sidebar{width:56px;padding:14px 6px}.sidebar h1,.sidebar .sub,.nav-item span{display:none}.nav-item{justify-content:center;padding:10px}.main{margin-left:56px;padding:14px}.grid-2{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="sidebar">
+    <h1>ðª Training Lab</h1>
+    <div class="sub">ãã¬ã¼ãã³ã°ç®¡çããã·ã¥ãã¼ã</div>
+    <div id="nav"></div>
+  </div>
+  <div class="main" id="main"></div>
+</div>
+
+<script>
+// ===== Embedded Data / URLå±æ =====
+var EMBEDDED_DATA = null;
+var VIEWER_MODE = false;
+
+// URLããã·ã¥ãããã¼ã¿ãèª­ã¿è¾¼ã¿
+(function(){
+  try {
+    const h = location.hash;
+    if(h && h.startsWith('#data=')){
+      const b64 = decodeURIComponent(h.slice(6));
+      const json = decodeURIComponent(atob(b64).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+      EMBEDDED_DATA = JSON.parse(json);
+    }
+  } catch(e){ console.log('URL data parse error', e); }
+})();
+
+// ===== State =====
+const S = {
+  page: 'dashboard',
+  trainings: [],
+  bodyRecords: [],
+  mealRecords: [],
+  menus: [],
+  profile: { name: '', height: '', trainerName: '' },
+  currentMonth: new Date().getMonth(),
+  currentYear: new Date().getFullYear(),
+  selectedDate: fmt(new Date()),
+};
+
+function fmt(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+const TODAY = fmt(new Date());
+const DAYS = ['æ¥','æ','ç«','æ°´','æ¨','é','å'];
+const CATS = ['è¸','èä¸­','è©','è','è','è¹','æé¸ç´ ','ã¹ãã¬ãã','ãã®ä»'];
+const CAT_COLORS = ['#4361ee','#f72585','#06d6a0','#ffd166','#ff6b6b','#845ec2','#00c9a7','#ffc75f','#adb5bd'];
+
+function daysInMonth(y,m){return new Date(y,m+1,0).getDate()}
+function firstDayOfMonth(y,m){return new Date(y,m,1).getDay()}
+
+// ===== LocalStorage =====
+function saveState(){
+  if(VIEWER_MODE) return;
+  try{localStorage.setItem('tlab',JSON.stringify({t:S.trainings,b:S.bodyRecords,m:S.mealRecords,mn:S.menus,p:S.profile}))}catch(e){}
+}
+function loadState(){
+  // åãè¾¼ã¿ãã¼ã¿ãããã°ãã¡ããåªåï¼å±æHTMLã®å ´åï¼
+  if(EMBEDDED_DATA){
+    try{
+      const d = EMBEDDED_DATA;
+      S.trainings=d.t||[];S.bodyRecords=d.b||[];S.mealRecords=d.m||[];S.menus=d.mn||[];S.profile=d.p||S.profile;
+      VIEWER_MODE = true;
+      return;
+    }catch(e){}
+  }
+  try{
+    const d=JSON.parse(localStorage.getItem('tlab'));
+    if(d){S.trainings=d.t||[];S.bodyRecords=d.b||[];S.mealRecords=d.m||[];S.menus=d.mn||[];S.profile=d.p||S.profile}
+  }catch(e){}
+}
+loadState();
+
+// ===== Nav =====
+const PAGES = [
+  {id:'dashboard',label:'ããã·ã¥ãã¼ã',icon:'ð'},
+  {id:'training',label:'ãã¬ã¼ãã³ã°è¨é²',icon:'ðï¸'},
+  {id:'menu',label:'ã¡ãã¥ã¼ç®¡ç',icon:'ð'},
+  {id:'body',label:'ä½éã»ä½åè¨é²',icon:'âï¸'},
+  {id:'meal',label:'é£äºè¨é²',icon:'ð½ï¸'},
+  {id:'annual',label:'å¹´éçµ±è¨',icon:'ð'},
+  {id:'settings',label:'è¨­å®ã»å±æ',icon:'âï¸'},
+];
+
+function renderNav(){
+  document.getElementById('nav').innerHTML = PAGES.map(p =>
+    `<div class="nav-item ${S.page===p.id?'active':''}" onclick="go('${p.id}')">${p.icon} <span>${p.label}</span></div>`
+  ).join('');
+}
+
+function viewerBanner(){
+  if(!VIEWER_MODE) return '';
+  const name = S.profile.name ? S.profile.name + 'ããã®' : '';
+  const date = EMBEDDED_DATA && EMBEDDED_DATA.exportDate ? EMBEDDED_DATA.exportDate : '';
+  return `<div style="background:linear-gradient(135deg,#06d6a0,#00b4d8);color:#fff;padding:12px 18px;border-radius:10px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between">
+    <div><strong>ð é²è¦§ã¢ã¼ã</strong><span style="margin-left:8px;font-size:13px">${name}ãã¬ã¼ãã³ã°ããã·ã¥ãã¼ã${date ? ' ('+date+' æç¹)' : ''}</span></div>
+    <span style="font-size:11px;opacity:.8">ãã¼ã¿ã¯èª­ã¿åãå°ç¨ã§ã</span>
+  </div>`;
+}
+
+function go(page){S.page=page;renderNav();renderPage()}
+
+// ===== Render =====
+function renderPage(){
+  const m = document.getElementById('main');
+  switch(S.page){
+    case 'dashboard': m.innerHTML = dashboardHTML(); break;
+    case 'training': m.innerHTML = trainingHTML(); break;
+    case 'menu': m.innerHTML = menuHTML(); break;
+    case 'body': m.innerHTML = bodyHTML(); break;
+    case 'meal': m.innerHTML = mealHTML(); break;
+    case 'annual': m.innerHTML = annualHTML(); break;
+    case 'settings': m.innerHTML = settingsHTML(); break;
+  }
+}
+
+// ===== Bar Chart Helper =====
+function barChart(data, color='var(--primary)'){
+  const max = Math.max(...data.map(d=>d.v), 1);
+  return `<div class="bar-chart">${data.map(d=>
+    `<div class="bar-col"><div class="bar-val">${d.v||''}</div><div class="bar" style="height:${(d.v/max)*120}px;background:${color}" title="${d.l}: ${d.v}"></div><div class="bar-label">${d.l}</div></div>`
+  ).join('')}</div>`;
+}
+
+// ===== Simple Line Chart (SVG) =====
+function lineChartSVG(data, key, color='var(--primary)'){
+  if(data.length<2) return '<div class="empty">2ä»¶ä»¥ä¸ã®ãã¼ã¿ã§ã°ã©ããè¡¨ç¤ºããã¾ã</div>';
+  const vals = data.map(d=>d[key]);
+  const min = Math.min(...vals) - 1;
+  const max = Math.max(...vals) + 1;
+  const range = max - min || 1;
+  const w = 100, h = 100;
+  const points = data.map((d,i)=>{
+    const x = (i/(data.length-1))*w;
+    const y = h - ((d[key]-min)/range)*h;
+    return `${x},${y}`;
+  });
+  const labels = data.map((d,i)=>{
+    const x = (i/(data.length-1))*w;
+    return `<text x="${x}%" y="98%" font-size="3" fill="#999" text-anchor="middle">${d.label||''}</text>`;
+  }).join('');
+  return `<div style="position:relative;height:200px;padding:10px 0"><svg viewBox="-2 -5 104 115" preserveAspectRatio="none" style="width:100%;height:100%">
+    <polyline points="${points.join(' ')}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    ${data.map((d,i)=>{const x=(i/(data.length-1))*w;const y=h-((d[key]-min)/range)*h;return `<circle cx="${x}" cy="${y}" r="1.5" fill="${color}"/><text x="${x}" y="${y-3}" font-size="2.8" fill="#333" text-anchor="middle">${d[key]}</text>`}).join('')}
+    ${labels}
+  </svg></div>`;
+}
+
+// ===== Dashboard =====
+function dashboardHTML(){
+  const mt = S.trainings.filter(t=>{const d=new Date(t.date);return d.getMonth()===S.currentMonth&&d.getFullYear()===S.currentYear});
+  const yt = S.trainings.filter(t=>new Date(t.date).getFullYear()===S.currentYear);
+  const lb = S.bodyRecords.length>0 ? S.bodyRecords[S.bodyRecords.length-1] : null;
+  const mealDays = S.mealRecords.filter(m=>{const d=new Date(m.date);return d.getMonth()===S.currentMonth&&d.getFullYear()===S.currentYear}).length;
+  const goal=20;
+  const pct = Math.min((mt.length/goal)*100,100);
+
+  // Recent
+  const recent = [...S.trainings].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);
+
+  // Category pie
+  const cc={};mt.forEach(t=>{cc[t.category]=(cc[t.category]||0)+1});
+  const catEntries = Object.entries(cc).sort((a,b)=>b[1]-a[1]);
+  const totalCat = catEntries.reduce((s,e)=>s+e[1],0)||1;
+
+  // Weekly
+  const wk=[];
+  for(let i=3;i>=0;i--){
+    const s=new Date();s.setDate(s.getDate()-(i*7+s.getDay()));
+    const e=new Date(s);e.setDate(e.getDate()+6);
+    const c=S.trainings.filter(t=>{const d=new Date(t.date);return d>=s&&d<=e}).length;
+    wk.push({l:`${s.getMonth()+1}/${s.getDate()}`,v:c});
+  }
+
+  return `
+    ${viewerBanner()}
+    <div class="page-title">ããã·ã¥ãã¼ã</div>
+    <div class="page-sub">${S.currentYear}å¹´${S.currentMonth+1}æã®ãµããªã¼</div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="label">ä»æã®ãã¬ã¼ãã³ã°</div><div class="value" style="color:var(--primary)">${mt.length}<span class="unit">/ ${goal}å</span></div>
+        <div class="progress-bar" style="margin-top:6px"><div class="fill" style="width:${pct}%;background:var(--primary)"></div></div></div>
+      <div class="stat-card"><div class="label">å¹´éãã¬ã¼ãã³ã°</div><div class="value" style="color:var(--accent)">${yt.length}<span class="unit">å</span></div><div class="sub">${S.currentYear}å¹´ã®ç´¯è¨</div></div>
+      <div class="stat-card"><div class="label">ç¾å¨ã®ä½é</div><div class="value" style="color:var(--success)">${lb?lb.weight:'--'}<span class="unit">kg</span></div><div class="sub">${lb?lb.date:'æªè¨é²'}</div></div>
+      <div class="stat-card"><div class="label">ä»æã®é£äºè¨é²</div><div class="value" style="color:var(--warning)">${mealDays}<span class="unit">æ¥</span></div><div class="sub">è¨é²ããæ¥æ°</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card"><h3>ð é±éãã¬ã¼ãã³ã°æ¨ç§»</h3>${wk.some(w=>w.v>0)?barChart(wk):'<div class="empty">ãã¬ã¼ãã³ã°ãè¨é²ããã¨ã°ã©ããè¡¨ç¤ºããã¾ã</div>'}</div>
+      <div class="card"><h3>ð¯ ã«ãã´ãªåå¸ï¼ä»æï¼</h3>${catEntries.length>0?catEntries.map(([c,v])=>{
+        const ci=CATS.indexOf(c);const col=CAT_COLORS[ci>=0?ci:8];
+        return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px"><span class="badge">${c}</span><div style="flex:1"><div class="progress-bar"><div class="fill" style="width:${(v/totalCat)*100}%;background:${col}"></div></div></div><span style="font-size:12px;font-weight:600">${v}å</span></div>`
+      }).join(''):'<div class="empty">ã«ãã´ãªå¥ã®åå¸ãè¡¨ç¤ºããã¾ã</div>'}</div>
+    </div>
+    <div class="card"><h3>ð æè¿ã®ãã¬ã¼ãã³ã°</h3>${recent.length>0?`<table><thead><tr><th>æ¥ä»</th><th>ã«ãã´ãª</th><th>ã¡ãã¥ã¼</th><th>ã¡ã¢</th></tr></thead><tbody>${recent.map(t=>
+      `<tr><td>${t.date}</td><td><span class="badge">${t.category}</span></td><td>${t.name}</td><td style="color:var(--gray);font-size:12px">${t.memo||'-'}</td></tr>`
+    ).join('')}</tbody></table>`:`<div class="empty">ã¾ã ãã¬ã¼ãã³ã°ãè¨é²ããã¦ãã¾ãã<br><br><button class="btn btn-primary" onclick="go('training')">ãã¬ã¼ãã³ã°ãè¨é²ãã</button></div>`}</div>
+  `;
+}
+
+// ===== Training =====
+function trainingHTML(){
+  const dim = daysInMonth(S.currentYear,S.currentMonth);
+  const fd = firstDayOfMonth(S.currentYear,S.currentMonth);
+  const mt = S.trainings.filter(t=>{const d=new Date(t.date);return d.getMonth()===S.currentMonth&&d.getFullYear()===S.currentYear});
+  const byDate={};mt.forEach(t=>{if(!byDate[t.date])byDate[t.date]=[];byDate[t.date].push(t)});
+
+  let cal = DAYS.map(d=>`<div class="calendar-header">${d}</div>`).join('');
+  for(let i=0;i<fd;i++) cal += '<div></div>';
+  for(let d=1;d<=dim;d++){
+    const ds = `${S.currentYear}-${String(S.currentMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dt = byDate[ds]||[];
+    const isToday = ds===TODAY;
+    cal += `<div class="cal-day ${dt.length?'has-training':''}" onclick="openTrainingAdd('${ds}')"><div class="dn ${isToday?'today':''}">${d}${isToday?' â':''}</div>${dt.map(t=>`<div class="ti">${t.category}</div>`).join('')}</div>`;
+  }
+
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+      <div><div class="page-title">ãã¬ã¼ãã³ã°è¨é²</div><div class="page-sub">æ¥ãã®ãã¬ã¼ãã³ã°ãè¨é²ã»ç®¡ç</div></div>
+      ${VIEWER_MODE?'':`<button class="btn btn-primary" onclick="openTrainingAdd('${TODAY}')">ï¼ è¨é²ãè¿½å </button>`}
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <button class="btn btn-outline btn-sm" onclick="changeMonth(-1)">â</button>
+        <h3 style="margin:0">${S.currentYear}å¹´ ${S.currentMonth+1}æ</h3>
+        <button class="btn btn-outline btn-sm" onclick="changeMonth(1)">â¶</button>
+      </div>
+      <div class="calendar-grid">${cal}</div>
+    </div>
+    <div class="card"><h3>ð ${S.currentMonth+1}æã®ãã¬ã¼ãã³ã°ä¸è¦§ï¼${mt.length}ä»¶ï¼</h3>
+      ${mt.length>0?`<table><thead><tr><th>æ¥ä»</th><th>ã«ãã´ãª</th><th>ã¡ãã¥ã¼</th><th>ã»ãã</th><th>ã¬ãã</th><th>éé</th><th>ã¡ã¢</th><th></th></tr></thead><tbody>${mt.map(t=>{
+        const gi=S.trainings.indexOf(t);
+        return `<tr><td>${t.date}</td><td><span class="badge">${t.category}</span></td><td>${t.name}</td><td>${t.sets||'-'}</td><td>${t.reps||'-'}</td><td>${t.weight_used?t.weight_used+'kg':'-'}</td><td style="font-size:11px;color:var(--gray)">${t.memo||'-'}</td><td><button class="btn btn-outline btn-sm" onclick="editTraining(${gi})">âï¸</button> <button class="btn btn-danger btn-sm" onclick="deleteTraining(${gi})">ð</button></td></tr>`;
+      }).join('')}</tbody></table>`:'<div class="empty">ãã®æã®ãã¬ã¼ãã³ã°è¨é²ã¯ããã¾ãã</div>'}
+    </div>
+  `;
+}
+
+function changeMonth(dir){
+  S.currentMonth+=dir;
+  if(S.currentMonth>11){S.currentMonth=0;S.currentYear++}
+  if(S.currentMonth<0){S.currentMonth=11;S.currentYear--}
+  renderPage();
+}
+
+function openTrainingAdd(date){
+  const menuOpts = S.menus.map(m=>`<option value="${esc(m.name)}">`).join('');
+  showModal('ãã¬ã¼ãã³ã°ãè¨é²',`
+    <div class="form-row"><div class="form-group"><label>æ¥ä»</label><input type="date" id="f_date" value="${date}"></div>
+    <div class="form-group"><label>ã«ãã´ãª</label><select id="f_cat">${CATS.map(c=>`<option>${c}</option>`).join('')}</select></div></div>
+    <div class="form-group"><label>ã¡ãã¥ã¼å</label><input id="f_name" placeholder="ä¾: ãã³ããã¬ã¹" list="ml"><datalist id="ml">${menuOpts}</datalist></div>
+    <div class="form-row"><div class="form-group"><label>ã»ããæ°</label><input type="number" id="f_sets" placeholder="3"></div>
+    <div class="form-group"><label>ã¬ããæ°</label><input type="number" id="f_reps" placeholder="10"></div>
+    <div class="form-group"><label>éé(kg)</label><input type="number" id="f_wt" placeholder="60"></div></div>
+    <div class="form-group"><label>ã¡ã¢</label><textarea id="f_memo" placeholder="ãã©ã¼ã ã«æ³¨æãæ¬¡åã¯ééã¢ãããªã©"></textarea></div>
+  `,()=>{
+    const name = document.getElementById('f_name').value;
+    if(!name){alert('ã¡ãã¥ã¼åãå¥åãã¦ãã ãã');return false}
+    S.trainings.push({date:document.getElementById('f_date').value,category:document.getElementById('f_cat').value,name,sets:document.getElementById('f_sets').value,reps:document.getElementById('f_reps').value,weight_used:document.getElementById('f_wt').value,memo:document.getElementById('f_memo').value});
+    saveState();renderPage();return true;
+  });
+}
+
+function editTraining(i){
+  const t=S.trainings[i];
+  showModal('ãã¬ã¼ãã³ã°ãç·¨é',`
+    <div class="form-row"><div class="form-group"><label>æ¥ä»</label><input type="date" id="f_date" value="${t.date}"></div>
+    <div class="form-group"><label>ã«ãã´ãª</label><select id="f_cat">${CATS.map(c=>`<option ${c===t.category?'selected':''}>${c}</option>`).join('')}</select></div></div>
+    <div class="form-group"><label>ã¡ãã¥ã¼å</label><input id="f_name" value="${esc(t.name)}"></div>
+    <div class="form-row"><div class="form-group"><label>ã»ããæ°</label><input type="number" id="f_sets" value="${t.sets||''}"></div>
+    <div class="form-group"><label>ã¬ããæ°</label><input type="number" id="f_reps" value="${t.reps||''}"></div>
+    <div class="form-group"><label>éé(kg)</label><input type="number" id="f_wt" value="${t.weight_used||''}"></div></div>
+    <div class="form-group"><label>ã¡ã¢</label><textarea id="f_memo">${esc(t.memo||'')}</textarea></div>
+  `,()=>{
+    const name=document.getElementById('f_name').value;
+    if(!name){alert('ã¡ãã¥ã¼åãå¥åãã¦ãã ãã');return false}
+    S.trainings[i]={date:document.getElementById('f_date').value,category:document.getElementById('f_cat').value,name,sets:document.getElementById('f_sets').value,reps:document.getElementById('f_reps').value,weight_used:document.getElementById('f_wt').value,memo:document.getElementById('f_memo').value};
+    saveState();renderPage();return true;
+  });
+}
+
+function deleteTraining(i){if(confirm('åé¤ãã¾ããï¼')){S.trainings.splice(i,1);saveState();renderPage()}}
+
+// ===== Menu =====
+function menuHTML(){
+  const byDay={};DAYS.forEach(d=>byDay[d]=[]);byDay['æªè¨­å®']=[];
+  S.menus.forEach(m=>{const d=m.dayOfWeek||'æªè¨­å®';if(!byDay[d])byDay[d]=[];byDay[d].push(m)});
+
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+      <div><div class="page-title">ã¡ãã¥ã¼ç®¡ç</div><div class="page-sub">é±éãã¬ã¼ãã³ã°ã¡ãã¥ã¼ã®è¨­å®</div></div>
+      ${VIEWER_MODE?'':`<button class="btn btn-primary" onclick="openMenuAdd()">ï¼ ã¡ãã¥ã¼è¿½å </button>`}
+    </div>
+    <div class="menu-cards-grid">${DAYS.map(day=>`<div class="card"><h3>${day}ææ¥</h3>${(byDay[day]||[]).length>0?(byDay[day]||[]).map(m=>{
+      const gi=S.menus.indexOf(m);
+      return `<div class="menu-card"><div style="display:flex;justify-content:space-between;align-items:center"><div><span class="badge" style="margin-right:5px">${m.category}</span><strong style="font-size:13px">${esc(m.name)}</strong></div><div><button class="btn btn-outline btn-sm" onclick="editMenu(${gi})">âï¸</button> <button class="btn btn-danger btn-sm" onclick="deleteMenu(${gi})">ð</button></div></div>${(m.targetSets||m.targetReps||m.targetWeight)?`<div style="font-size:11px;color:var(--gray);margin-top:3px">${m.targetSets?m.targetSets+'ã»ãã':''} ${m.targetReps?'Ã '+m.targetReps+'ã¬ãã':''} ${m.targetWeight?'@ '+m.targetWeight+'kg':''}</div>`:''}</div>`;
+    }).join(''):'<div style="color:#ccc;font-size:12px;text-align:center;padding:16px">ä¼æ¯æ¥</div>'}</div>`).join('')}</div>
+    ${(byDay['æªè¨­å®']||[]).length>0?`<div class="card" style="margin-top:16px"><h3>ð ææ¥æªè¨­å®</h3>${byDay['æªè¨­å®'].map(m=>{const gi=S.menus.indexOf(m);return `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #f0f0f0"><div><span class="badge" style="margin-right:5px">${m.category}</span>${esc(m.name)}</div><div><button class="btn btn-outline btn-sm" onclick="editMenu(${gi})">âï¸</button> <button class="btn btn-danger btn-sm" onclick="deleteMenu(${gi})">ð</button></div></div>`}).join('')}</div>`:''}
+  `;
+}
+
+function openMenuAdd(){
+  showModal('ã¡ãã¥ã¼ãè¿½å ',`
+    <div class="form-row"><div class="form-group"><label>ã«ãã´ãª</label><select id="f_cat">${CATS.map(c=>`<option>${c}</option>`).join('')}</select></div>
+    <div class="form-group"><label>ææ¥</label><select id="f_dow"><option value="">æªè¨­å®</option>${DAYS.map(d=>`<option value="${d}">${d}</option>`).join('')}</select></div></div>
+    <div class="form-group"><label>ã¡ãã¥ã¼å</label><input id="f_name" placeholder="ä¾: ãã³ããã¬ã¹"></div>
+    <div class="form-row"><div class="form-group"><label>ç®æ¨ã»ãã</label><input type="number" id="f_sets" placeholder="3"></div>
+    <div class="form-group"><label>ç®æ¨ã¬ãã</label><input type="number" id="f_reps" placeholder="10"></div>
+    <div class="form-group"><label>ç®æ¨éé(kg)</label><input type="number" id="f_wt" placeholder="60"></div></div>
+    <div class="form-group"><label>ã¡ã¢</label><textarea id="f_memo" placeholder="ãã©ã¼ã ã®æ³¨æç¹ãªã©"></textarea></div>
+  `,()=>{
+    const name=document.getElementById('f_name').value;if(!name){alert('ã¡ãã¥ã¼åãå¥å');return false}
+    S.menus.push({name,category:document.getElementById('f_cat').value,dayOfWeek:document.getElementById('f_dow').value,targetSets:document.getElementById('f_sets').value,targetReps:document.getElementById('f_reps').value,targetWeight:document.getElementById('f_wt').value,notes:document.getElementById('f_memo').value});
+    saveState();renderPage();return true;
+  });
+}
+
+function editMenu(i){
+  const m=S.menus[i];
+  showModal('ã¡ãã¥ã¼ãç·¨é',`
+    <div class="form-row"><div class="form-group"><label>ã«ãã´ãª</label><select id="f_cat">${CATS.map(c=>`<option ${c===m.category?'selected':''}>${c}</option>`).join('')}</select></div>
+    <div class="form-group"><label>ææ¥</label><select id="f_dow"><option value="">æªè¨­å®</option>${DAYS.map(d=>`<option value="${d}" ${d===m.dayOfWeek?'selected':''}>${d}</option>`).join('')}</select></div></div>
+    <div class="form-group"><label>ã¡ãã¥ã¼å</label><input id="f_name" value="${esc(m.name)}"></div>
+    <div class="form-row"><div class="form-group"><label>ç®æ¨ã»ãã</label><input type="number" id="f_sets" value="${m.targetSets||''}"></div>
+    <div class="form-group"><label>ç®æ¨ã¬ãã</label><input type="number" id="f_reps" value="${m.targetReps||''}"></div>
+    <div class="form-group"><label>ç®æ¨éé(kg)</label><input type="number" id="f_wt" value="${m.targetWeight||''}"></div></div>
+    <div class="form-group"><label>ã¡ã¢</label><textarea id="f_memo">${esc(m.notes||'')}</textarea></div>
+  `,()=>{
+    const name=document.getElementById('f_name').value;if(!name){alert('ã¡ãã¥ã¼åãå¥å');return false}
+    S.menus[i]={name,category:document.getElementById('f_cat').value,dayOfWeek:document.getElementById('f_dow').value,targetSets:document.getElementById('f_sets').value,targetReps:document.getElementById('f_reps').value,targetWeight:document.getElementById('f_wt').value,notes:document.getElementById('f_memo').value};
+    saveState();renderPage();return true;
+  });
+}
+
+function deleteMenu(i){if(confirm('åé¤ãã¾ããï¼')){S.menus.splice(i,1);saveState();renderPage()}}
+
+// ===== Body =====
+function bodyHTML(){
+  const lb = S.bodyRecords.length>0?S.bodyRecords[S.bodyRecords.length-1]:null;
+  const bmi = lb&&S.profile.height?(parseFloat(lb.weight)/Math.pow(parseFloat(S.profile.height)/100,2)).toFixed(1):'--';
+  const change = S.bodyRecords.length>=2?(parseFloat(S.bodyRecords[S.bodyRecords.length-1].weight)-parseFloat(S.bodyRecords[0].weight)).toFixed(1):'--';
+
+  const chartData = S.bodyRecords.map(r=>({label:r.date.slice(5),weight:parseFloat(r.weight)}));
+
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+      <div><div class="page-title">ä½éã»ä½åè¨é²</div><div class="page-sub">ä½éã¨ä½èè©ç¾ã®æ¨ç§»ãè¨é²</div></div>
+      ${VIEWER_MODE?'':`<button class="btn btn-primary" onclick="openBodyAdd()">ï¼ è¨é²ãè¿½å </button>`}
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="label">èº«é·</div><div class="value" style="font-size:22px">${S.profile.height||'--'}<span class="unit">cm</span></div></div>
+      <div class="stat-card"><div class="label">ææ°ä½é</div><div class="value" style="font-size:22px;color:var(--primary)">${lb?lb.weight:'--'}<span class="unit">kg</span></div></div>
+      <div class="stat-card"><div class="label">BMI</div><div class="value" style="font-size:22px;color:var(--accent)">${bmi}</div></div>
+      <div class="stat-card"><div class="label">ä½éå¤å</div><div class="value" style="font-size:22px;color:var(--success)">${change!=='--'?(parseFloat(change)>=0?'+':'')+change:'--'}<span class="unit">kg</span></div></div>
+    </div>
+    <div class="card"><h3>ð ä½éæ¨ç§»ã°ã©ã</h3>${lineChartSVG(chartData,'weight','var(--primary)')}</div>
+    <div class="card"><h3>ð è¨é²ä¸è¦§</h3>
+      ${S.bodyRecords.length>0?`<table><thead><tr><th>æ¥ä»</th><th>ä½é(kg)</th><th>ä½èèªç(%)</th><th>ã¡ã¢</th><th></th></tr></thead><tbody>${[...S.bodyRecords].reverse().map((r,i)=>{
+        const gi=S.bodyRecords.length-1-i;
+        return `<tr><td>${r.date}</td><td style="font-weight:600">${r.weight}</td><td>${r.bodyFat||'-'}</td><td style="font-size:11px;color:var(--gray)">${r.memo||'-'}</td><td><button class="btn btn-danger btn-sm" onclick="deleteBody(${gi})">ð</button></td></tr>`;
+      }).join('')}</tbody></table>`:'<div class="empty">ä½éã»ä½åã®è¨é²ãè¿½å ãã¦ãã ãã</div>'}
+    </div>
+  `;
+}
+
+function openBodyAdd(){
+  showModal('ä½éã»ä½åãè¨é²',`
+    <div class="form-group"><label>æ¥ä»</label><input type="date" id="f_date" value="${TODAY}"></div>
+    <div class="form-row"><div class="form-group"><label>ä½é(kg)</label><input type="number" step="0.1" id="f_wt" placeholder="70.0"></div>
+    <div class="form-group"><label>ä½èèªç(%) â»ä»»æ</label><input type="number" step="0.1" id="f_bf" placeholder="15.0"></div></div>
+    <div class="form-group"><label>ã¡ã¢</label><textarea id="f_memo" placeholder="ä½èª¿ãè¦ãç®ã®å¤åãªã©"></textarea></div>
+  `,()=>{
+    const w=document.getElementById('f_wt').value;if(!w){alert('ä½éãå¥åãã¦ãã ãã');return false}
+    S.bodyRecords.push({date:document.getElementById('f_date').value,weight:w,bodyFat:document.getElementById('f_bf').value,memo:document.getElementById('f_memo').value});
+    S.bodyRecords.sort((a,b)=>a.date.localeCompare(b.date));
+    saveState();renderPage();return true;
+  });
+}
+
+function deleteBody(i){if(confirm('åé¤ãã¾ããï¼')){S.bodyRecords.splice(i,1);saveState();renderPage()}}
+
+// ===== Meal =====
+function mealHTML(){
+  const dim = daysInMonth(S.currentYear,S.currentMonth);
+  const mealDates = new Set(S.mealRecords.map(m=>m.date));
+  const ex = S.mealRecords.find(m=>m.date===S.selectedDate);
+  const mealCount = S.mealRecords.filter(m=>{const d=new Date(m.date);return d.getMonth()===S.currentMonth&&d.getFullYear()===S.currentYear}).length;
+
+  let picker = '';
+  for(let d=1;d<=dim;d++){
+    const ds = `${S.currentYear}-${String(S.currentMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isSel = ds===S.selectedDate;
+    const has = mealDates.has(ds);
+    picker += `<div class="dp ${isSel?'sel':has?'has':''}" onclick="selectMealDate('${ds}')">${d}</div>`;
+  }
+
+  return `
+    <div class="page-title">é£äºè¨é²</div>
+    <div class="page-sub">æ¯æ¥ã®é£äºåå®¹ãã·ã³ãã«ã«è¨é²</div>
+    <div class="grid-2">
+      <div>
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <button class="btn btn-outline btn-sm" onclick="changeMealMonth(-1)">â</button>
+            <h3 style="margin:0">${S.currentYear}å¹´ ${S.currentMonth+1}æ</h3>
+            <button class="btn btn-outline btn-sm" onclick="changeMealMonth(1)">â¶</button>
+          </div>
+          <div class="day-picker">${picker}</div>
+        </div>
+        <div class="card"><h3>ð ä»æã®è¨é²ç¶æ³</h3>
+          <div style="font-size:13px">è¨é²æ¥æ°: <strong>${mealCount}</strong> / ${dim}æ¥</div>
+          <div class="progress-bar" style="margin-top:6px"><div class="fill" style="width:${(mealCount/dim)*100}%;background:var(--success)"></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>ð½ï¸ ${S.selectedDate} ã®é£äº</h3>
+        <div class="form-group"><label>ð æé£</label><textarea id="meal_b" rows="2" placeholder="ä¾: ãé£¯ãå³åæ±ãåµç¼ã">${esc(ex?.breakfast||'')}</textarea></div>
+        <div class="form-group"><label>âï¸ æ¼é£</label><textarea id="meal_l" rows="2" placeholder="ä¾: ãã­ã³ãµã©ããçç±³ãã«ãã">${esc(ex?.lunch||'')}</textarea></div>
+        <div class="form-group"><label>ð å¤é£</label><textarea id="meal_d" rows="2" placeholder="ä¾: é®­ã®å¡©ç¼ãããµã©ãããé£¯">${esc(ex?.dinner||'')}</textarea></div>
+        <div class="form-group"><label>ðª éé£</label><textarea id="meal_s" rows="2" placeholder="ä¾: ãã­ãã¤ã³ãããã">${esc(ex?.snack||'')}</textarea></div>
+        <div class="form-group"><label>ð ã¡ã¢</label><textarea id="meal_m" rows="2" placeholder="æ°´åæåéãä½èª¿ãªã©">${esc(ex?.memo||'')}</textarea></div>
+        ${VIEWER_MODE?'':'<button class="btn btn-primary" style="width:100%" onclick="saveMeal()">ð¾ ä¿å­</button>'}
+      </div>
+    </div>
+  `;
+}
+
+function selectMealDate(d){S.selectedDate=d;renderPage()}
+function changeMealMonth(dir){
+  S.currentMonth+=dir;
+  if(S.currentMonth>11){S.currentMonth=0;S.currentYear++}
+  if(S.currentMonth<0){S.currentMonth=11;S.currentYear--}
+  const dim=daysInMonth(S.currentYear,S.currentMonth);
+  const selDay=parseInt(S.selectedDate.split('-')[2]);
+  const nd=Math.min(selDay,dim);
+  S.selectedDate=`${S.currentYear}-${String(S.currentMonth+1).padStart(2,'0')}-${String(nd).padStart(2,'0')}`;
+  renderPage();
+}
+
+function saveMeal(){
+  S.mealRecords = S.mealRecords.filter(m=>m.date!==S.selectedDate);
+  S.mealRecords.push({date:S.selectedDate,breakfast:document.getElementById('meal_b').value,lunch:document.getElementById('meal_l').value,dinner:document.getElementById('meal_d').value,snack:document.getElementById('meal_s').value,memo:document.getElementById('meal_m').value});
+  S.mealRecords.sort((a,b)=>a.date.localeCompare(b.date));
+  saveState();
+  alert('ä¿å­ãã¾ãã');
+  renderPage();
+}
+
+// ===== Annual =====
+function annualHTML(){
+  const MONTHS = ['1æ','2æ','3æ','4æ','5æ','6æ','7æ','8æ','9æ','10æ','11æ','12æ'];
+  const md = MONTHS.map((m,i)=>{
+    const c = S.trainings.filter(t=>{const d=new Date(t.date);return d.getFullYear()===S.currentYear&&d.getMonth()===i}).length;
+    return {l:m,v:c};
+  });
+  const total = md.reduce((s,d)=>s+d.v,0);
+  const yt = S.trainings.filter(t=>new Date(t.date).getFullYear()===S.currentYear);
+  const cc={};yt.forEach(t=>{cc[t.category]=(cc[t.category]||0)+1});
+  const catData = Object.entries(cc).sort((a,b)=>b[1]-a[1]);
+  const maxCat = catData.length>0?catData[0][1]:1;
+  const bestMonth = md.reduce((mx,d)=>d.v>mx.v?d:mx,{v:0}).l||'--';
+
+  const yb = S.bodyRecords.filter(r=>new Date(r.date).getFullYear()===S.currentYear);
+  const wData = yb.map(r=>({label:r.date.slice(5),weight:parseFloat(r.weight)}));
+
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+      <div><div class="page-title">å¹´éçµ±è¨</div><div class="page-sub">${S.currentYear}å¹´ã®ãã¬ã¼ãã³ã°ãµããªã¼</div></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn btn-outline btn-sm" onclick="S.currentYear--;renderPage()">â ${S.currentYear-1}</button>
+        <strong>${S.currentYear}å¹´</strong>
+        <button class="btn btn-outline btn-sm" onclick="S.currentYear++;renderPage()">${S.currentYear+1} â¶</button>
+      </div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="label">å¹´éãã¬ã¼ãã³ã°æ°</div><div class="value" style="color:var(--primary)">${total}<span class="unit">å</span></div></div>
+      <div class="stat-card"><div class="label">æå¹³å</div><div class="value" style="color:var(--accent)">${total>0?(total/12).toFixed(1):'0'}<span class="unit">å/æ</span></div></div>
+      <div class="stat-card"><div class="label">æå¤æ</div><div class="value" style="color:var(--success);font-size:20px">${bestMonth}</div></div>
+      <div class="stat-card"><div class="label">ã«ãã´ãªæ°</div><div class="value" style="color:var(--warning)">${Object.keys(cc).length}</div></div>
+    </div>
+    <div class="card"><h3>ð æå¥ãã¬ã¼ãã³ã°åæ°</h3>${barChart(md)}</div>
+    <div class="grid-2">
+      <div class="card"><h3>ð ã«ãã´ãªå¥ã©ã³ã­ã³ã°</h3>${catData.length>0?catData.map(([c,v],i)=>{
+        const ci=CATS.indexOf(c);const col=CAT_COLORS[ci>=0?ci:8];
+        return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="width:20px;font-weight:700;color:${i<3?'var(--accent)':'var(--gray)'}">${i+1}</span><span class="badge">${c}</span><div style="flex:1"><div class="progress-bar"><div class="fill" style="width:${(v/maxCat)*100}%;background:${col}"></div></div></div><span style="font-weight:600;font-size:13px">${v}å</span></div>`;
+      }).join(''):'<div class="empty">ãã¼ã¿ãããã¾ãã</div>'}</div>
+      <div class="card"><h3>ð å¹´éä½éæ¨ç§»</h3>${lineChartSVG(wData,'weight','var(--accent)')}</div>
+    </div>
+  `;
+}
+
+// ===== Settings =====
+function settingsHTML(){
+  return `
+    <div class="page-title">è¨­å®ã»å±æ</div>
+    <div class="page-sub">ãã­ãã£ã¼ã«è¨­å®ã¨ãã¼ã¿ã®å±æ</div>
+    ${VIEWER_MODE ? '' : `
+    <div class="share-banner"><div><strong>ãã¬ã¼ãã¼ã¨ãã¼ã¿ãå±æ</strong><p>ãå±æURLãã³ãã¼ããæ¼ãã¦ããã¬ã¼ãã¼ã«URLãéãã ããã¯ãªãã¯ããã ãã§åãããã·ã¥ãã¼ããè¦ããã¾ãã</p></div></div>
+    `}
+    <div class="grid-2">
+      <div class="card"><h3>ð¤ ãã­ãã£ã¼ã«</h3>
+        <div class="form-group"><label>åå</label><input id="s_name" value="${esc(S.profile.name)}" placeholder="ååãå¥å" onchange="S.profile.name=this.value;saveState()" ${VIEWER_MODE?'disabled':''}></div>
+        <div class="form-group"><label>èº«é· (cm)</label><input type="number" id="s_height" value="${S.profile.height}" placeholder="170" onchange="S.profile.height=this.value;saveState()" ${VIEWER_MODE?'disabled':''}></div>
+        <div class="form-group"><label>ãã¬ã¼ãã¼å</label><input id="s_trainer" value="${esc(S.profile.trainerName)}" placeholder="ãã¬ã¼ãã¼ã®åå" onchange="S.profile.trainerName=this.value;saveState()" ${VIEWER_MODE?'disabled':''}></div>
+      </div>
+      <div class="card"><h3>ð¤ ãã¼ã¿å±æ</h3>
+        ${VIEWER_MODE ? `
+          <div style="background:#e6faf3;padding:12px;border-radius:8px;margin-bottom:12px;font-size:13px;color:#06a77d"><strong>é²è¦§ã¢ã¼ã</strong><br>ãã®ãã¡ã¤ã«ã¯å±æç¨ã§ãããã¼ã¿ã®ç·¨éã¯ãªãªã¸ãã«ãã¡ã¤ã«ã§è¡ã£ã¦ãã ããã</div>
+        ` : `
+          <p style="font-size:13px;color:var(--gray);margin-bottom:10px"><strong style="color:var(--accent)">ãããã:</strong> å±æURLãçæãã¦ãã¬ã¼ãã¼ã«éãã ããã¯ãªãã¯ããã ãã§ããã·ã¥ãã¼ããéãã¾ãã</p>
+          <button class="btn btn-accent" style="width:100%;margin-bottom:8px;padding:12px" onclick="generateShareURL()">ð å±æURLãã³ãã¼</button>
+          <div id="share-url-box" style="display:none;margin-bottom:14px">
+            <input id="share-url-input" readonly style="font-size:11px;background:#f8f9fa;cursor:pointer" onclick="this.select();document.execCommand('copy')">
+            <div style="font-size:11px;color:var(--success);margin-top:4px">â URLãã³ãã¼ãã¾ããï¼ãã¬ã¼ãã¼ã«ãã®URLãéã£ã¦ãã ãã</div>
+          </div>
+          <hr style="border:none;border-top:1px solid #eee;margin:14px 0">
+          <p style="font-size:13px;color:var(--gray);margin-bottom:8px">ãã®ä»ã®å±ææ¹æ³:</p>
+          <button class="btn btn-primary" style="width:100%;margin-bottom:8px" onclick="generateShareHTML()">ð HTMLãã¡ã¤ã«ã§å±æ</button>
+          <button class="btn btn-outline" style="width:100%;margin-bottom:8px" onclick="exportData()">ð¥ JSONã¨ã¯ã¹ãã¼ã</button>
+          <label class="btn btn-outline" style="width:100%;justify-content:center;cursor:pointer">ð JSONã¤ã³ãã¼ã<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
+        `}
+      </div>
+    </div>
+    <div class="card"><h3>â¹ï¸ ä½¿ãæ¹</h3><div style="font-size:13px;line-height:1.8;color:var(--gray)">
+      <p><strong>1. ã¡ãã¥ã¼ç®¡ç</strong>: é±éã®ãã¬ã¼ãã³ã°ã¡ãã¥ã¼ãææ¥ãã¨ã«è¨­å®</p>
+      <p><strong>2. ãã¬ã¼ãã³ã°è¨é²</strong>: æ¯æ¥ã®ãã¬ã¼ãã³ã°åå®¹ï¼ã»ããæ°ã»ã¬ããæ°ã»ééï¼ãè¨é²</p>
+      <p><strong>3. ä½éã»ä½åè¨é²</strong>: ä½éã¨ä½èèªçãå®æçã«è¨é²ãæ¨ç§»ãã°ã©ãã§ç¢ºèª</p>
+      <p><strong>4. é£äºè¨é²</strong>: æã»æ¼ã»å¤ã»éé£ãã·ã³ãã«ã«ã¡ã¢ã¨ãã¦è¨é²</p>
+      <p><strong>5. å¹´éçµ±è¨</strong>: å¹´éã®ãã¬ã¼ãã³ã°åæ°ãã«ãã´ãªåå¸ãç¢ºèª</p>
+      <p><strong>6. ãã¼ã¿å±æ</strong>: å±æHTMLããã¬ã¼ãã¼ã«éãã°åãç»é¢ã§é²è¦§å¯è½</p>
+      <p style="margin-top:8px;color:var(--primary)">â» ãã¼ã¿ã¯ãã©ã¦ã¶ã®LocalStorageã«ä¿å­ããã¾ããå¥ã®ãã©ã¦ã¶ã§ä½¿ãå ´åã¯ã¨ã¯ã¹ãã¼ã/ã¤ã³ãã¼ãããå©ç¨ãã ããã</p>
+    </div></div>
+  `;
+}
+
+// ===== å±æURLçæ =====
+function generateShareURL(){
+  const data = {t:S.trainings,b:S.bodyRecords,m:S.mealRecords,mn:S.menus,p:S.profile,exportDate:TODAY};
+  const json = JSON.stringify(data);
+  // UTF-8å¯¾å¿ã®Base64ã¨ã³ã³ã¼ã
+  const b64 = btoa(encodeURIComponent(json).replace(/%([0-9A-F]{2})/g,(m,p)=>String.fromCharCode('0x'+p)));
+  const base = location.origin + location.pathname;
+  const url = base + '#data=' + encodeURIComponent(b64);
+
+  // URLé·ãã§ãã¯ï¼ãã©ã¦ã¶ã®ä¸éã¯ç´2MBãå®å¨ãã¼ã¸ã³ã§64KBï¼
+  if(url.length > 65000){
+    alert('ãã¼ã¿éãå¤ããã¦URLã«åã¾ãã¾ããã\nãHTMLãã¡ã¤ã«ã§å±æãããå©ç¨ãã ããã');
+    return;
+  }
+
+  const box = document.getElementById('share-url-box');
+  const input = document.getElementById('share-url-input');
+  box.style.display = 'block';
+  input.value = url;
+  input.select();
+  try{ navigator.clipboard.writeText(url); }catch(e){ document.execCommand('copy'); }
+}
+
+// ===== èªå·±å®çµåHTMLçæ =====
+function generateShareHTML(){
+  const data = {t:S.trainings,b:S.bodyRecords,m:S.mealRecords,mn:S.menus,p:S.profile,exportDate:TODAY};
+  // ç¾å¨ã®HTMLã½ã¼ã¹ãåå¾
+  let html = document.documentElement.outerHTML;
+  // DOCTYPEè¿½å 
+  html = '<!DOCTYPE html>\n<html lang="ja">' + html.slice(html.indexOf('<head'));
+  // EMBEDDED_DATAãåãæ¿ã
+  html = html.replace(
+    'var EMBEDDED_DATA = null;',
+    'var EMBEDDED_DATA = ' + JSON.stringify(data) + ';'
+  );
+  const name = S.profile.name ? S.profile.name + 'ãã' : '';
+  const blob = new Blob([html], {type:'text/html;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `training-dashboard-${name ? name + '-' : ''}${TODAY}.html`;
+  a.click();
+  URL.revokeObjectURL(url);
+  alert('å±æç¨HTMLãã¡ã¤ã«ããã¦ã³ã­ã¼ããã¾ããã\nãã®ãã¡ã¤ã«ããã¬ã¼ãã¼ã«éã£ã¦ãã ããã\nãã¬ã¼ãã¼ã¯ãã©ã¦ã¶ã§éãã ãã§é²è¦§ã§ãã¾ãã');
+}
+
+function exportData(){
+  const data=JSON.stringify({t:S.trainings,b:S.bodyRecords,m:S.mealRecords,mn:S.menus,p:S.profile,exportDate:TODAY},null,2);
+  const blob=new Blob([data],{type:'application/json'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');
+  a.href=url;a.download=`training-data-${TODAY}.json`;a.click();URL.revokeObjectURL(url);
+}
+
+function importData(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=(ev)=>{
+    try{
+      const d=JSON.parse(ev.target.result);
+      if(d.t)S.trainings=d.t;if(d.b)S.bodyRecords=d.b;if(d.m)S.mealRecords=d.m;if(d.mn)S.menus=d.mn;if(d.p)S.profile=d.p;
+      saveState();renderPage();alert('ãã¼ã¿ãèª­ã¿è¾¼ã¿ã¾ãã');
+    }catch{alert('ãã¡ã¤ã«å½¢å¼ãæ­£ããããã¾ãã')}
+  };
+  reader.readAsText(file);
+}
+
+// ===== Modal =====
+function showModal(title, body, onSave){
+  const overlay = document.createElement('div');
+  overlay.className='modal-overlay';
+  overlay.innerHTML=`<div class="modal"><h3>${title}</h3>${body}<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px"><button class="btn btn-outline" id="modal-cancel">ã­ã£ã³ã»ã«</button><button class="btn btn-primary" id="modal-save">ä¿å­</button></div></div>`;
+  overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.remove()});
+  document.body.appendChild(overlay);
+  overlay.querySelector('.modal').addEventListener('click',e=>e.stopPropagation());
+  document.getElementById('modal-cancel').onclick=()=>overlay.remove();
+  document.getElementById('modal-save').onclick=()=>{if(onSave()){overlay.remove()}};
+}
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+// ===== Init =====
+renderNav();
+renderPage();
+</script>
+</body>
+</html>
